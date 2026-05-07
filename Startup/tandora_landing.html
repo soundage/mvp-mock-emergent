@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tandora — управление семейным лагерем</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal-50: #E1F5EE;
+    --teal-100: #9FE1CB;
+    --teal-500: #1D9E75;
+    --teal-600: #0F6E56;
+    --teal-800: #085041;
+    --gray-50: #F7F6F3;
+    --gray-100: #EDECEA;
+    --gray-200: #D3D1C7;
+    --gray-500: #888780;
+    --gray-700: #5F5E5A;
+    --gray-900: #2C2C2A;
+    --red-50: #FCEBEB;
+    --red-600: #A32D2D;
+    --amber-50: #FAEEDA;
+    --amber-600: #854F0B;
+    --blue-50: #E6F1FB;
+    --blue-600: #185FA5;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--gray-900);
+    background: #fff;
+    line-height: 1.65;
+    font-size: 16px;
+  }
+
+  /* NAV */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 2rem; border-bottom: 0.5px solid var(--gray-200);
+    position: sticky; top: 0; background: #fff; z-index: 100;
+  }
+  .logo { font-size: 20px; font-weight: 600; color: var(--teal-600); letter-spacing: -0.3px; }
+  .nav-cta {
+    background: var(--teal-600); color: #fff; border: none; padding: 8px 20px;
+    border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none;
+  }
+  .nav-cta:hover { background: var(--teal-800); }
+
+  /* SECTIONS */
+  section { padding: 5rem 2rem; max-width: 1000px; margin: 0 auto; }
+  .section-label {
+    font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--teal-500); margin-bottom: 0.75rem;
+  }
+  h1 { font-size: clamp(32px, 5vw, 52px); font-weight: 600; line-height: 1.15; letter-spacing: -0.5px; color: var(--gray-900); }
+  h2 { font-size: clamp(24px, 3.5vw, 36px); font-weight: 600; line-height: 1.2; letter-spacing: -0.3px; color: var(--gray-900); }
+  h3 { font-size: 18px; font-weight: 500; color: var(--gray-900); }
+  p { color: var(--gray-700); }
+
+  /* HERO */
+  #hero { padding-top: 6rem; padding-bottom: 5rem; text-align: center; }
+  #hero h1 { max-width: 720px; margin: 0 auto 1.5rem; }
+  #hero .subtitle { font-size: 18px; color: var(--gray-700); max-width: 540px; margin: 0 auto 2.5rem; }
+  .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--teal-600); color: #fff; border: none; padding: 14px 28px;
+    border-radius: 10px; font-size: 15px; font-weight: 500; cursor: pointer; text-decoration: none;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--teal-800); }
+  .btn-ghost {
+    background: none; color: var(--gray-700); border: 0.5px solid var(--gray-200);
+    padding: 14px 24px; border-radius: 10px; font-size: 15px; font-weight: 500; cursor: pointer;
+  }
+  .btn-ghost:hover { background: var(--gray-50); }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--teal-50); color: var(--teal-600); border: 0.5px solid var(--teal-100);
+    padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; margin-bottom: 2rem;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal-500); display: inline-block; }
+
+  /* MOCKUP PREVIEW */
+  .hero-preview {
+    margin: 3.5rem auto 0; max-width: 780px; background: var(--gray-50);
+    border: 0.5px solid var(--gray-200); border-radius: 16px; overflow: hidden;
+  }
+  .preview-bar {
+    display: flex; align-items: center; gap: 6px; padding: 10px 14px;
+    background: var(--gray-100); border-bottom: 0.5px solid var(--gray-200);
+  }
+  .preview-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .preview-inner { padding: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .mini-card {
+    background: #fff; border: 0.5px solid var(--gray-200); border-radius: 8px;
+    padding: 12px 14px; font-size: 12px;
+  }
+  .mini-card .name { font-weight: 500; color: var(--gray-900); margin-bottom: 6px; }
+  .mini-card .row { display: flex; justify-content: space-between; color: var(--gray-500); margin-bottom: 3px; }
+  .mini-card .row span:last-child { color: var(--gray-900); font-weight: 500; }
+  .badge-ready { background: #E1F5EE; color: #085041; font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 500; display: inline-block; margin-top: 6px; }
+  .badge-warn { background: #FAEEDA; color: #854F0B; font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 500; display: inline-block; margin-top: 6px; }
+  .badge-debt { background: #FCEBEB; color: #A32D2D; font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 500; display: inline-block; margin-top: 6px; }
+
+  /* PROBLEM */
+  #problem { background: #fff; }
+  #problem-inner { background: var(--gray-50); border-radius: 20px; padding: 3.5rem; margin-top: 2rem; }
+  .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; }
+  .problem-item {
+    background: #fff; border: 0.5px solid var(--gray-200); border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+  }
+  .problem-item .icon { font-size: 22px; margin-bottom: 0.5rem; }
+  .problem-item h3 { margin-bottom: 0.4rem; font-size: 15px; }
+  .problem-item p { font-size: 14px; line-height: 1.6; }
+  .problem-quote {
+    margin-top: 2rem; padding: 1.5rem 2rem; background: var(--red-50);
+    border-left: 3px solid var(--red-600); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-style: italic; color: var(--gray-700); font-size: 15px;
+  }
+
+  /* SOLUTION */
+  #solution { }
+  .solution-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2.5rem; }
+  .solution-card {
+    background: var(--gray-50); border: 0.5px solid var(--gray-200); border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+  .solution-card .pill {
+    display: inline-block; background: var(--teal-50); color: var(--teal-600);
+    font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 999px; margin-bottom: 1rem;
+    border: 0.5px solid var(--teal-100);
+  }
+  .solution-card h3 { margin-bottom: 0.4rem; }
+  .solution-card p { font-size: 14px; }
+
+  /* HOW IT WORKS */
+  #howitworks { background: var(--teal-50); border-radius: 24px; padding: 4rem 3rem; margin: 0 1rem; max-width: 1000px; margin: 0 auto; }
+  .steps { display: flex; gap: 0; margin-top: 2.5rem; flex-direction: column; }
+  .step { display: flex; gap: 1.5rem; padding: 1.25rem 0; border-bottom: 0.5px solid var(--teal-100); }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    min-width: 36px; height: 36px; border-radius: 50%; background: var(--teal-600); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; flex-shrink: 0;
+  }
+  .step-body h3 { font-size: 16px; margin-bottom: 0.25rem; color: var(--teal-800); }
+  .step-body p { font-size: 14px; color: var(--teal-600); }
+
+  /* FOR WHOM */
+  #forwhom { }
+  .for-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 2.5rem; }
+  .for-card {
+    background: var(--gray-50); border: 0.5px solid var(--gray-200); border-radius: var(--radius);
+    padding: 1.5rem; text-align: center;
+  }
+  .for-icon { font-size: 28px; margin-bottom: 0.75rem; }
+  .for-card h3 { font-size: 15px; margin-bottom: 0.5rem; }
+  .for-card p { font-size: 13px; color: var(--gray-500); }
+
+  /* PAIN SUMMARY */
+  .pain-strip {
+    background: var(--gray-900); color: #fff; text-align: center;
+    padding: 3rem 2rem;
+  }
+  .pain-strip h2 { color: #fff; font-size: clamp(20px, 3vw, 28px); max-width: 640px; margin: 0 auto 0.5rem; }
+  .pain-strip p { color: var(--gray-200); font-size: 15px; }
+
+  /* CTA */
+  #cta { text-align: center; }
+  #cta h2 { max-width: 520px; margin: 0 auto 1rem; }
+  #cta p { margin-bottom: 2rem; }
+
+  /* FAQ */
+  #faq {}
+  .faq-list { margin-top: 2rem; }
+  .faq-item { border-bottom: 0.5px solid var(--gray-200); }
+  .faq-q {
+    width: 100%; background: none; border: none; text-align: left; padding: 1.25rem 0;
+    font-size: 15px; font-weight: 500; color: var(--gray-900); cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  }
+  .faq-q:hover { color: var(--teal-600); }
+  .faq-arrow { font-size: 18px; color: var(--gray-500); transition: transform 0.2s; flex-shrink: 0; }
+  .faq-a { font-size: 14px; color: var(--gray-700); padding: 0 0 1.25rem; display: none; line-height: 1.7; }
+  .faq-item.open .faq-a { display: block; }
+  .faq-item.open .faq-arrow { transform: rotate(180deg); }
+
+  /* FORM */
+  #form-section { background: var(--gray-50); border-radius: 24px; padding: 4rem 3rem; margin: 0 1rem 4rem; max-width: 1000px; margin: 0 auto 4rem; }
+  .form-inner { max-width: 480px; margin: 0 auto; }
+  .form-inner h2 { text-align: center; margin-bottom: 0.5rem; }
+  .form-inner .sub { text-align: center; color: var(--gray-500); font-size: 14px; margin-bottom: 2rem; }
+  .form-row { margin-bottom: 1rem; }
+  .form-row label { display: block; font-size: 13px; font-weight: 500; color: var(--gray-700); margin-bottom: 6px; }
+  .form-row input, .form-row select, .form-row textarea {
+    width: 100%; padding: 11px 14px; font-size: 15px;
+    border: 0.5px solid var(--gray-200); border-radius: 8px; background: #fff;
+    color: var(--gray-900); outline: none; font-family: inherit;
+    transition: border-color 0.15s;
+  }
+  .form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+    border-color: var(--teal-500); box-shadow: 0 0 0 3px rgba(29,158,117,0.1);
+  }
+  .form-row textarea { resize: vertical; min-height: 90px; }
+  .form-submit {
+    width: 100%; background: var(--teal-600); color: #fff; border: none;
+    padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 500; cursor: pointer;
+    margin-top: 0.5rem; transition: background 0.15s;
+  }
+  .form-submit:hover { background: var(--teal-800); }
+  .form-note { text-align: center; font-size: 12px; color: var(--gray-500); margin-top: 0.75rem; }
+  .success-msg {
+    background: var(--teal-50); border: 0.5px solid var(--teal-100); border-radius: var(--radius);
+    padding: 2rem; text-align: center; display: none;
+  }
+  .success-msg h3 { color: var(--teal-600); margin-bottom: 0.5rem; }
+  .success-msg p { color: var(--teal-800); font-size: 14px; }
+
+  /* FOOTER */
+  footer {
+    border-top: 0.5px solid var(--gray-200); padding: 2rem; text-align: center;
+    font-size: 13px; color: var(--gray-500);
+  }
+  .footer-logo { font-weight: 600; color: var(--teal-600); margin-bottom: 0.5rem; font-size: 15px; }
+
+  /* DIVIDER */
+  .section-divider { height: 0.5px; background: var(--gray-200); max-width: 1000px; margin: 0 auto; }
+
+  @media (max-width: 640px) {
+    nav { padding: 0.75rem 1rem; }
+    section { padding: 3.5rem 1rem; }
+    .problem-grid, .solution-grid, .for-grid { grid-template-columns: 1fr; }
+    #problem-inner, #howitworks, #form-section { padding: 2.5rem 1.25rem; margin: 0; }
+    .preview-inner { grid-template-columns: 1fr; }
+    #cta { padding: 3rem 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Tandora</div>
+  <a href="#form-section" class="nav-cta">Попробовать бесплатно</a>
+</nav>
+
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-badge"><span class="dot"></span> Для организаторов семейных лагерей</div>
+
+  <h1>Все семьи — под контролем.<br>Без таблиц. Без хаоса.</h1>
+
+  <p class="subtitle">
+    Tandora заменяет Excel + Telegram + Word + вашу личную память.
+    Вы всегда знаете: кто едет, кто должен деньги и кто готов к заезду.
+  </p>
+
+  <div class="hero-actions">
+    <a href="#form-section" class="btn-primary">Получить ранний доступ</a>
+    <a href="#howitworks" class="btn-ghost">Как это работает →</a>
+  </div>
+
+  <!-- mini preview -->
+  <div class="hero-preview">
+    <div class="preview-bar">
+      <span class="preview-dot" style="background:#ff5f57"></span>
+      <span class="preview-dot" style="background:#febc2e"></span>
+      <span class="preview-dot" style="background:#28c840"></span>
+      <span style="margin-left:8px; font-size:12px; color:var(--gray-500)">Лагерь «Подмосковный июль 2025» · 14 семей</span>
+    </div>
+    <div class="preview-inner">
+      <div class="mini-card">
+        <div class="name">Семья Соколовых</div>
+        <div class="row"><span>Взрослые</span><span>2</span></div>
+        <div class="row"><span>Дети</span><span>3</span></div>
+        <div class="row"><span>Итого</span><span>95 000 ₽</span></div>
+        <div class="row"><span>Остаток</span><span>0 ₽</span></div>
+        <span class="badge-ready">✓ Готова к заезду</span>
+      </div>
+      <div class="mini-card">
+        <div class="name">Семья Ершовых</div>
+        <div class="row"><span>Взрослые</span><span>2</span></div>
+        <div class="row"><span>Дети</span><span>1</span></div>
+        <div class="row"><span>Итого</span><span>58 000 ₽</span></div>
+        <div class="row"><span>Остаток</span><span>20 000 ₽</span></div>
+        <span class="badge-debt">Есть долг</span>
+      </div>
+      <div class="mini-card">
+        <div class="name">Семья Никитиных</div>
+        <div class="row"><span>Взрослые</span><span>2</span></div>
+        <div class="row"><span>Дети</span><span>2</span></div>
+        <div class="row"><span>Итого</span><span>76 000 ₽</span></div>
+        <div class="row"><span>Оплачено</span><span>76 000 ₽</span></div>
+        <span class="badge-warn">Документы не закрыты</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+
+<!-- PROBLEM -->
+<section id="problem" style="padding-top:5rem; padding-bottom:5rem; max-width:1000px; margin:0 auto;">
+  <div id="problem-inner">
+    <div class="section-label">Знакомая картина?</div>
+    <h2>Организация лагеря — это не отдых.<br>Это героизм в таблице.</h2>
+
+    <div class="problem-grid">
+      <div class="problem-item">
+        <div class="icon">📊</div>
+        <h3>Google-таблица с 30 колонками</h3>
+        <p>Формулы сломались, цвета съехали, кто-то что-то удалил. Версия от пятницы уже неактуальна.</p>
+      </div>
+      <div class="problem-item">
+        <div class="icon">💬</div>
+        <h3>Telegram и личные сообщения</h3>
+        <p>«Мы передумали, берём ещё одного ребёнка» — и снова пересчитывать всё вручную.</p>
+      </div>
+      <div class="problem-item">
+        <div class="icon">🧾</div>
+        <h3>Расчёты в голове и на листочке</h3>
+        <p>У каждой семьи своя история: скидка, рассрочка, частичная предоплата. Держать это в уме — невозможно.</p>
+      </div>
+      <div class="problem-item">
+        <div class="icon">📄</div>
+        <h3>Документы — в WhatsApp и почте</h3>
+        <p>Кто прислал договор, кто нет — снова поиск по переписке за три недели.</p>
+      </div>
+    </div>
+
+    <div class="problem-quote">
+      «За три дня до заезда я не могу ответить на простой вопрос: сколько семей реально едут и кто ещё не доплатил?»
+    </div>
+  </div>
+</section>
+
+
+<!-- PAIN STRIP -->
+<div class="pain-strip">
+  <h2>Главный конкурент Tandora — не другое приложение.</h2>
+  <p>Это таблица + мессенджер + ваша личная память.</p>
+</div>
+
+
+<!-- SOLUTION -->
+<section id="solution" style="padding-top:5rem; padding-bottom:5rem; max-width:1000px; margin:0 auto;">
+  <div class="section-label">Решение</div>
+  <h2>Одна карточка семьи.<br>Всё, что нужно — в одном месте.</h2>
+  <p style="margin-top:0.75rem; max-width:560px;">Tandora ведёт каждую семью от первого добавления до готовности к заезду. Без формул. Без версий. Без потерянных сообщений.</p>
+
+  <div class="solution-grid">
+    <div class="solution-card">
+      <div class="pill">Состав</div>
+      <h3>Кто едет</h3>
+      <p>Взрослые, дети, возраст — всё в карточке. Изменился состав — меняете в одном месте.</p>
+    </div>
+    <div class="solution-card">
+      <div class="pill">Расчёт</div>
+      <h3>Сколько стоит</h3>
+      <p>Добавляете позиции, скидки, доплаты — итог считается автоматически. Без Excel.</p>
+    </div>
+    <div class="solution-card">
+      <div class="pill">Оплата</div>
+      <h3>Кто и сколько заплатил</h3>
+      <p>Фиксируете платежи вручную — предоплату, рассрочку, финальный платёж. Остаток всегда перед глазами.</p>
+    </div>
+    <div class="solution-card">
+      <div class="pill">Документы</div>
+      <h3>Договоры не потеряются</h3>
+      <p>Статус документов каждой семьи: запрошены, получены, проверены. И ссылка на папку.</p>
+    </div>
+    <div class="solution-card">
+      <div class="pill">Готовность</div>
+      <h3>Кто готов к заезду</h3>
+      <p>Tandora сама показывает, у кого есть долг, незакрытые документы или неподтверждённый статус.</p>
+    </div>
+    <div class="solution-card">
+      <div class="pill">Экспорт</div>
+      <h3>Список для отеля и кухни</h3>
+      <p>Один клик — и у вас готовый список в CSV или Excel. С фильтрами: только готовые, только с долгом.</p>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+
+<!-- HOW IT WORKS -->
+<section id="howitworks" style="max-width:1000px; margin:0 auto; padding: 5rem 2rem;">
+  <div style="background: var(--teal-50); border-radius: 20px; padding: 3.5rem;">
+    <div class="section-label">Как работает</div>
+    <h2>От первой заявки до списка на заезде — без таблиц</h2>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Создаёте лагерь</h3>
+          <p>Название, даты, место, валюта. Готово за минуту.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Добавляете семьи вручную</h3>
+          <p>Пришло сообщение в Telegram — открываете Tandora и добавляете: имя, телефон, состав семьи.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Рассчитываете стоимость</h3>
+          <p>Добавляете позиции расчёта прямо в карточке. Скидки, доплаты — всё здесь. Итог считается сам.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Фиксируете оплаты</h3>
+          <p>Внесли предоплату — отметили. Поступил финальный платёж — отметили. Остаток виден сразу.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h3>Следите за документами и статусами</h3>
+          <p>Запросили договор, получили, проверили — один клик на каждый шаг.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <h3>Видите картину целиком</h3>
+          <p>Кто готов, у кого долг, у кого документы не закрыты — фильтр за секунду. Экспорт — один клик.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- FOR WHOM -->
+<section id="forwhom" style="max-width:1000px; margin:0 auto; padding: 0 2rem 5rem;">
+  <div class="section-label">Для кого</div>
+  <h2>Tandora создана для вас, если вы…</h2>
+
+  <div class="for-grid">
+    <div class="for-card">
+      <div class="for-icon">🏕️</div>
+      <h3>Организуете семейный лагерь</h3>
+      <p>Сезонный или регулярный, 10 семей или 60 — не важно.</p>
+    </div>
+    <div class="for-card">
+      <div class="for-icon">📱</div>
+      <h3>Получаете заявки в мессенджерах</h3>
+      <p>И тратите часы, чтобы перенести это в таблицу.</p>
+    </div>
+    <div class="for-card">
+      <div class="for-icon">😰</div>
+      <h3>Делаете всё самостоятельно</h3>
+      <p>Без команды, без CRM, без бюджета на разработчика.</p>
+    </div>
+    <div class="for-card">
+      <div class="for-icon">💸</div>
+      <h3>Вручную считаете оплаты</h3>
+      <p>И перед каждым заездом не знаете, кто ещё не доплатил.</p>
+    </div>
+    <div class="for-card">
+      <div class="for-icon">📋</div>
+      <h3>Собираете документы в WhatsApp</h3>
+      <p>И теряете их в переписке за три недели до лагеря.</p>
+    </div>
+    <div class="for-card">
+      <div class="for-icon">🔥</div>
+      <h3>Хотите нормально подготовиться</h3>
+      <p>А не выгорать за три дня до заезда, сводя концы с концами.</p>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+
+<!-- CTA MID -->
+<section id="cta" style="max-width:1000px; margin:0 auto; padding:5rem 2rem;">
+  <div class="section-label">Ранний доступ</div>
+  <h2>Оставьте заявку — и ведите следующий лагерь без таблиц</h2>
+  <p style="margin-bottom:2rem;">Мы открываем доступ для первых организаторов. Пилот — бесплатно.</p>
+  <a href="#form-section" class="btn-primary">Хочу попробовать →</a>
+</section>
+
+<div class="section-divider"></div>
+
+
+<!-- FAQ -->
+<section id="faq" style="max-width:1000px; margin:0 auto; padding:5rem 2rem;">
+  <div class="section-label">Вопросы и ответы</div>
+  <h2>FAQ</h2>
+
+  <div class="faq-list">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Я уже веду всё в Google Sheets. Зачем мне переходить?
+        <span class="faq-arrow">⌄</span>
+      </button>
+      <div class="faq-a">
+        Google Sheets не умеет сам считать готовность семьи к заезду. Он не покажет, у кого есть долг, у кого не закрыты документы — без ваших формул и ручного труда. Tandora делает это за вас, и не ломается, когда кто-то меняет ячейку.
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Нужно ли семьям регистрироваться в Tandora?
+        <span class="faq-arrow">⌄</span>
+      </button>
+      <div class="faq-a">
+        Нет. Семьи не видят Tandora и не заходят в неё. Вы добавляете данные вручную после сообщения в Telegram, WhatsApp или после звонка — как привыкли. Личный кабинет для родителей — это будущий шаг.
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Можно ли принимать оплату через Tandora?
+        <span class="faq-arrow">⌄</span>
+      </button>
+      <div class="faq-a">
+        В первой версии — нет. Вы принимаете оплату как обычно (карта, перевод, наличные), а в Tandora просто фиксируете факт оплаты. Интеграция с эквайрингом — в следующих версиях.
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        А если состав семьи изменится после расчёта?
+        <span class="faq-arrow">⌄</span>
+      </button>
+      <div class="faq-a">
+        Tandora сохранит все ранее зафиксированные платежи и покажет предупреждение: «Расчёт изменён — проверьте оплату». Остаток пересчитается автоматически. История не теряется.
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Это дорого? Есть бесплатный период?
+        <span class="faq-arrow">⌄</span>
+      </button>
+      <div class="faq-a">
+        Мы сейчас в стадии пилота и открываем доступ первым организаторам бесплатно. Оставьте заявку — обсудим условия лично. Нам важно понять, как Tandora работает в реальном лагере.
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Я смогу выгрузить список семей для отеля или кухни?
+        <span class="faq-arrow">⌄</span>
+      </button>
+      <div class="faq-a">
+        Да. Один клик — и вы получаете CSV или Excel со всеми нужными полями: имя, состав, суммы, статусы. Можно экспортировать всех или только отфильтрованных (например, только готовых к заезду).
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- FORM -->
+<section id="form-section" style="max-width:1000px; margin:0 auto; padding:0 2rem 5rem;">
+  <div style="background: var(--gray-50); border-radius: 20px; padding: 3.5rem 2rem;">
+    <div class="form-inner">
+      <div class="section-label" style="text-align:center;">Ранний доступ</div>
+      <h2>Хочу вести следующий лагерь через Tandora</h2>
+      <p class="sub">Расскажите немного о себе — свяжемся лично и настроим всё вместе.</p>
+
+      <form id="leadForm">
+        <div class="form-row">
+          <label for="name">Ваше имя *</label>
+          <input type="text" id="name" placeholder="Ольга Смирнова" required>
+        </div>
+        <div class="form-row">
+          <label for="phone">Телефон или Telegram *</label>
+          <input type="text" id="phone" placeholder="+7 900 123-45-67 или @username" required>
+        </div>
+        <div class="form-row">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="olga@example.com">
+        </div>
+        <div class="form-row">
+          <label for="camp-size">Сколько семей обычно в вашем лагере?</label>
+          <select id="camp-size">
+            <option value="">— выберите —</option>
+            <option>До 10 семей</option>
+            <option>10–25 семей</option>
+            <option>25–50 семей</option>
+            <option>50+ семей</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="pain">Что сейчас самое сложное в организации? (необязательно)</label>
+          <textarea id="pain" placeholder="Например: теряю, кто не доплатил. Или: каждый раз пересчитываю всё вручную после изменений..."></textarea>
+        </div>
+        <button type="submit" class="form-submit">Отправить заявку →</button>
+        <p class="form-note">Никакого спама. Свяжемся в течение 24 часов.</p>
+      </form>
+
+      <div class="success-msg" id="successMsg">
+        <div style="font-size:32px; margin-bottom:0.75rem;">🎉</div>
+        <h3>Заявка принята!</h3>
+        <p>Свяжемся с вами в течение 24 часов и расскажем всё про ранний доступ. Спасибо, что доверяете нам следующий лагерь.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Tandora</div>
+  <p>Управление семейным лагерем — просто и без Excel.</p>
+  <p style="margin-top:0.5rem;">© 2025 Tandora. Все права защищены.</p>
+</footer>
+
+
+<script>
+function toggleFaq(btn) {
+  const item = btn.closest('.faq-item');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+document.getElementById('leadForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  this.style.display = 'none';
+  document.getElementById('successMsg').style.display = 'block';
+});
+
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', function(e) {
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
+</body>
+</html>
